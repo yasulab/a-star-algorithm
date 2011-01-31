@@ -1,0 +1,11 @@
+6 5
+......
+...*..
+..##..
+......
+..o...
+this is a test.
+this is a test.
+this is a test.
+this is a test.
+this is a test.
