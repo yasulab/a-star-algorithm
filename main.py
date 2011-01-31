@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+from optparse import OptionParser
 import os
 import re
 import Queue
@@ -165,7 +166,7 @@ def explore_maze():
         i += 1
         show_pathmap()
     print
-    print "There is no way to reach the goal state."
+    print "There is no path exists."
     exit()
 
 def mark(loc):
@@ -182,7 +183,13 @@ def set_markmap():
 
 def print_markmap():
     for lines in markmap:
-        print lines
+        for bln in lines:
+            if bln == True:
+                print " M",
+            else:
+                print " .",
+        print
+    print
 
 def store_loc_on_pathmap(loc):
     global pathmap
@@ -200,6 +207,19 @@ def show_pathmap():
     
 
 if __name__ == "__main__":
+    parser = OptionParser()
+    parser.add_option(
+        "-H",
+        type="choice",
+        choices=["zero", "manhattan", "euclidean"],
+        dest="heuristic_type",
+        default="zero",
+        metavar="HEURISTIC_FUNC",
+        help="choose a heuristic function for A* algorithm form zero, manhattan, euclidean",
+        )
+    (options, args) = parser.parse_args() 
+    heuristic_type = options.heuristic_type
+    
     set_maze("./input.txt")
     print "Given:"
     print_maze()
