@@ -2,8 +2,7 @@
 # -*- coding:utf-8 -*-
 
 from optparse import OptionParser
-import os
-import re
+import math
 import Queue
 
 agenda = Queue.PriorityQueue()
@@ -19,6 +18,7 @@ Y = 1
 COST = 0
 LOC = 1
 DEBUG = False
+heuristic_type = ""
 
 def read_file(filename):
     input = open(filename, "r")
@@ -113,8 +113,26 @@ def print_agenda():
     for elem in elements:
         agenda.put(elem)    
     
-def zero_heuristic(location):
+def zero_heuristic(loc):
     return 0
+
+def manhattan_heuristic(loc):
+    x1 = abs(start_loc[X] - loc[X])
+    y1 = abs(start_loc[Y] - loc[Y])
+    s = x1 + y1
+    x2 = abs(finish_loc[X] - loc[X])
+    y2 = abs(finish_loc[Y] - loc[Y])
+    f = x2 + y2
+    return s+f
+
+def euclidean_heuristic(loc):
+    x1 = abs(start_loc[X] - loc[X])
+    y1 = abs(start_loc[Y] - loc[Y])
+    s = math.sqrt((x1**2 + y1**2))
+    x2 = abs(finish_loc[X] - loc[X])
+    y2 = abs(finish_loc[Y] - loc[Y])
+    f = math.sqrt((x2**2 + y2**2))
+    return s+f
 
 def get_mark_from_markmap(loc):
     return markmap[loc[Y]][loc[X]]
@@ -132,7 +150,18 @@ def put_loc_into_agenda(cost, loc):
     mark(loc)
     agenda.put((cost, loc))
     print str(loc) + " is put into agenda with "+ str(cost) +" cost."
-    
+
+def calc_heuristic(loc):
+    if heuristic_type == "zero":
+        return zero_heuristic(loc)
+    elif heuristic_type == "manhattan":
+        return manhattan_heuristic(loc)
+    elif heuristic_type == "euclidean":
+        return euclidean_heuristic(loc)
+    else:
+        print "Error: unknown heuristic type is found: " + heuristic_type
+        exit()
+        
 def put_around_locs_into_agenda(loc):
     new_locs = []
     new_locs.append((loc[X], loc[Y]-1))
@@ -144,7 +173,7 @@ def put_around_locs_into_agenda(loc):
             if 0 <= loc[Y] and loc[Y] < height:
                 if is_loc_marked(loc): continue
                 if is_loc_wall(loc): continue
-                cost = zero_heuristic(loc)
+                cost = calc_heuristic(loc)
                 put_loc_into_agenda(cost, loc)
 
 def explore_maze():
@@ -162,7 +191,7 @@ def explore_maze():
             return
         put_around_locs_into_agenda(loc)
         print_agenda()
-        print_markmap()
+        #print_markmap()
         i += 1
         show_pathmap()
     print
