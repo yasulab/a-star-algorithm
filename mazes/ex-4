@@ -1,0 +1,16 @@
+5 5
+.....
+.....
+....o
+..###
+....*
+
+The example map where one of the heuristics
+will find an incorrect shortest path under
+'-d' option.
+
+Zero:
+
+Manhattan:
+
+Euclidean:

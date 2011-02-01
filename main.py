@@ -20,6 +20,7 @@ COST = 0
 LOC = 1
 DEBUG = False
 heuristic_type = ""
+count_queue = 0
 
 def read_file(filename):
     input = open(filename, "r")
@@ -110,17 +111,39 @@ def print_agenda():
         agenda.put(elem)    
     
 def zero_heuristic(loc):
-    return 0
+    global count_queue
+    count_queue += 1
+    return count_queue
 
 def manhattan_heuristic(loc):
     ans = []
     for finish_loc in finish_locs:
-        x1 = abs(start_loc[X] - loc[X])
-        y1 = abs(start_loc[Y] - loc[Y])
-        s = x1 + y1
-        x2 = abs(finish_loc[X] - loc[X])
-        y2 = abs(finish_loc[Y] - loc[Y])
-        f = x2 + y2
+        cost = 0
+        if DFLAG:
+            x1 = abs(start_loc[X] - loc[X])
+            y1 = abs(start_loc[Y] - loc[Y])
+            while 0 <= x1 and 0 <= y1:
+                x1 -= 1
+                y1 -= 1
+                cost += 3 
+            s = (x1 + y1) * 2 + cost
+            print "s: " + str(s)
+            cost = 0
+            x2 = abs(finish_loc[X] - loc[X])
+            y2 = abs(finish_loc[Y] - loc[Y])
+            while 0 <= x2 and 0 <= y2:
+                x2 -= 1
+                y2 -= 1
+                cost += 3 
+            f = (x2 + y2) * 2 + cost
+            print "f: " + str(f)
+        else:
+            x1 = abs(start_loc[X] - loc[X])
+            y1 = abs(start_loc[Y] - loc[Y])
+            s = x1 + y1
+            x2 = abs(finish_loc[X] - loc[X])
+            y2 = abs(finish_loc[Y] - loc[Y])
+            f = x2 + y2
         ans.append((s+f))
     ans.sort()
     return ans[0]
@@ -170,10 +193,15 @@ def calc_heuristic(loc):
 def get_children(loc):
     children = []
     new_locs = []
+    if DFLAG: new_locs.append((loc[X]-1, loc[Y]-1))
     new_locs.append((loc[X], loc[Y]-1))
+    if DFLAG: new_locs.append((loc[X]+1, loc[Y]-1))
     new_locs.append((loc[X]-1, loc[Y]))
     new_locs.append((loc[X]+1, loc[Y]))
+    if DFLAG: new_locs.append((loc[X]-1, loc[Y]+1))
     new_locs.append((loc[X], loc[Y]+1))
+    if DFLAG: new_locs.append((loc[X]+1, loc[Y]+1))
+        
     for loc in new_locs:
         if 0 <= loc[X] and loc[X] < width:
             if 0 <= loc[Y] and loc[Y] < height:
