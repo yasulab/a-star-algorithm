@@ -266,7 +266,7 @@ if __name__ == "__main__":
         help="choose a formatted text file for creating a maze. This program uses 'mazes/sample' by default."
         )
     parser.add_option(
-        "-H",
+        "-H", "--heuristic",
         type="choice",
         choices=["zero", "manhattan", "euclidean"],
         dest="heuristic_type",

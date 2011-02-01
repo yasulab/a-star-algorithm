@@ -2,7 +2,11 @@ Author: Yohei YASUKAWA
 Date: 01/31/2011
 Mail: yasulab@gmail.com
 
-Description:
+COMP 343 Hwk2 - A* Algorith
+===========================
+
+Description
+-----------
 This program implements the idea of A* algorithm
 with following three heuristic functions:
 
@@ -44,7 +48,8 @@ For example, in the following state, the cost should be 10.
     . . . . . . . . x
 
 
-How To Run:
+How To Run
+----------
 1. Get python 2.6 or higher
 
 2. Type following command in your terminal.
@@ -65,8 +70,188 @@ the following options will be useful.
   -v, --verbose         display information verbosely.
 
 
+Problem 2.1
+-----------
+On Church, you can see how A* algorithm run by typing
+the following command. By default, the program uses
+the Zero heuristic function.
+
+  $ python ./main.py [-H (zero | manhattan | euclidean)]
   
-Get Latest Code:
+Problem 2.2
+-----------
+To illustrate interesting aspects between the heuristics,
+I devised the two maps to compare, "ex-1" and "ex-2",
+which are put in the "mazes" directory.
+
+The "ex-1" is 3x3 and "ex-2" is 10x10 maze composed as follows:
+
+3 3
+*..
+...
+..o
+
+10 10
+*.........
+..........
+..........
+..........
+..........
+..........
+..........
+..........
+..........
+.........o
+
+Both maps are made by pure open spaces. The start location
+is put on the most right bottom and finish location is put
+on the most top left.
+
+In "ex-1", the exploring path is different between
+heuristics, but all the heuristics can explore in most
+effective ways as follows:
+
+Zero:
+ 4  .  .
+ 3  .  .
+ 2  1  0
+
+Manhattan:
+ 4  .  .
+ 3  .  .
+ 2  1  0
+
+Euclidean:
+ 4  .  .
+ 3  2  .
+ .  1  0
+	 
+On the other hand, in "ex-2", the Zero and Manhattan
+heuristics shows the most effective exploring path,
+as shown in the following map:
+
+Zero:
+18  .  .  .  .  .  .  .  .  .
+17  .  .  .  .  .  .  .  .  .
+16  .  .  .  .  .  .  .  .  .
+15  .  .  .  .  .  .  .  .  .
+14  .  .  .  .  .  .  .  .  .
+13  .  .  .  .  .  .  .  .  .
+12  .  .  .  .  .  .  .  .  .
+11  .  .  .  .  .  .  .  .  .
+10  .  .  .  .  .  .  .  .  .
+ 9  8  7  6  5  4  3  2  1  0
+
+Manhattan:
+18  .  .  .  .  .  .  .  .  .
+17  .  .  .  .  .  .  .  .  .
+16  .  .  .  .  .  .  .  .  .
+15  .  .  .  .  .  .  .  .  .
+14  .  .  .  .  .  .  .  .  .
+13  .  .  .  .  .  .  .  .  .
+12  .  .  .  .  .  .  .  .  .
+11  .  .  .  .  .  .  .  .  .
+10  .  .  .  .  .  .  .  .  .
+ 9  8  7  6  5  4  3  2  1  0
+
+However, as the following map shows, the euclidean
+heuristic works not in effective; it takes 25 steps
+to find shortest path, although the other two found
+it with 18 steps.
+
+Euclidean:
+25  .  .  .  .  .  .  .  .  .
+24 21 22  .  .  .  .  .  .  .
+ . 20 17 18  .  .  .  .  .  .
+ .  . 16 13 14  .  .  .  .  .
+ .  .  . 12 10 11  .  .  .  .
+ .  .  .  .  9  8 15  .  .  .
+ .  .  .  .  .  7  6 19  .  .
+ .  .  .  .  .  .  5  4 23  .
+ .  .  .  .  .  .  .  3  2  .
+ .  .  .  .  .  .  .  .  1  0
+
+The reasons why the other two heuristics take 18 steps
+are same. Needless to say, Zero heuristic calculates
+costs of each space as 0, so all space has same cost.
+In Manhattan heuristic, because there are no walls in
+the maze and the start and finish location is put symmetrically,
+the cost of each space is all same in A* algorithm.
+
+Consequently, as described in the "Description", both
+heuristics follow the aspect of Queue.PriorityQueue
+in Python library: compare XCoord if cost is same,
+and compare YCoord if cost and XCoord are same.
+And luckily, the finish location is put on the
+most top left, so they did not spend waste steps at all.
+
+On the other hand, in Euclidean heuristic, it seemed to
+explore in effective up to 10 steps like "ex-1". However,
+after that, it explored locations around the center rather
+than the locations close to the finish. The reason is, as follows,
+the Euclidean distance makes the cost higher near the finish
+(A), and makes the cost relatively lower near the center(B).
+
+
+(A) cost of x = 1 + sqrt(81+100)
+    	      = 1 + sqrt(181)
+	      -> 1 + 13.45 = 14.45
+  0 1 2 3 4 5 6 7 8 9 10
+0 * . . . . . . . . . .
+1 x . . . . . . . . . .
+2 . . . . . . . . . . .
+3 . . . . . . . . . . .
+4 . . . . . . . . . . .
+5 . . . . . . . . . . .
+6 . . . . . . . . . . .
+7 . . . . . . . . . . .
+8 . . . . . . . . . . .
+9 . . . . . . . . . . .
+10. . . . . . . . . . o
+
+
+(B) cost of x = 5 + sqrt(49+36)
+    	      = 5 + sqrt(85)
+	      -> 5 + 9.22 = 14.22
+  0 1 2 3 4 5 6 7 8 9 10
+0 * . . . . . . . . . .
+1 . . . . . . . . . . .
+2 . . . . . . . . . . .
+3 . . . . . . . . . . .
+4 . . . . . . . . . . .
+5 . . . . . . . . . . .
+6 . . . . . . . x . . .
+7 . . . . . . . . . . .
+8 . . . . . . . . . . .
+9 . . . . . . . . . . .
+10. . . . . . . . . . o
+
+
+As the costs above demonstrate, the location around
+the center has relatively lower cost than near the
+finish. Thereby, even though exploring locations
+around the center seems to be waste, the Euclidean
+hueristic explores them first.
+
+Therefore, with the help of Queue.PriorityQueue
+convention and cost calculations of Euclidean,
+the interesting results between hueristics
+appeared when comparing "ex-1" and "ex-2".
+
+
+Problem 2.3
+-----------
+
+
+Problem 2.4
+-----------
+
+
+
+
+
+Get Latest Code
+---------------
 If you would like to see/run the latest code,
 type following command to clone it with Git.
 
