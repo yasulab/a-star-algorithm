@@ -12,7 +12,8 @@ maze = []
 start_loc = []
 finish_loc = []
 markmap = []
-pathmap = []
+exploremap = []
+pathmap = {}
 X = 0
 Y = 1
 COST = 0
@@ -24,18 +25,10 @@ def read_file(filename):
     input = open(filename, "r")
     return input.read()
 
-def read_file_as_list(filename):
-    input = open(filename, "r")
-    return input.read().splitlines()
-
 def save_file(file):
     fd = open("./output.txt", "w")
     fd.write(file)
     fd.close
-
-def error(msg):
-    print msg
-    exit()
 
 def set_maze(filename):
     global width, height, start_loc, finish_loc
@@ -105,10 +98,13 @@ def test_pq():
 def print_agenda():
     elements = []
     i = 0
+    print "\tPriority Queue:"
     while not agenda.empty():
         element = agenda.get()
         elements.append(element)
-        print str(i) + ": " + str(element[LOC]) + " with " + str(element[COST]) + " cost."
+        if VFLAG:
+
+            print '\t\t' + str(i) + ": " + str(element[LOC]) + " with " + str(element[COST]) + " cost."
         i += 1
     for elem in elements:
         agenda.put(elem)    
@@ -146,10 +142,11 @@ def is_loc_wall(loc):
     else:
         return False
     
-def put_loc_into_agenda(cost, loc):
+def put_child_into_agenda(cost, loc):
     mark(loc)
     agenda.put((cost, loc))
-    print str(loc) + " is put into agenda with "+ str(cost) +" cost."
+    if VFLAG:
+        print '\t' + str(loc) + " is put into agenda." # with "+ str(cost) +" cost."
 
 def calc_heuristic(loc):
     if heuristic_type == "zero":
@@ -162,7 +159,8 @@ def calc_heuristic(loc):
         print "Error: unknown heuristic type is found: " + heuristic_type
         exit()
         
-def put_around_locs_into_agenda(loc):
+def get_children(loc):
+    children = []
     new_locs = []
     new_locs.append((loc[X], loc[Y]-1))
     new_locs.append((loc[X]-1, loc[Y]))
@@ -173,27 +171,33 @@ def put_around_locs_into_agenda(loc):
             if 0 <= loc[Y] and loc[Y] < height:
                 if is_loc_marked(loc): continue
                 if is_loc_wall(loc): continue
-                cost = calc_heuristic(loc)
-                put_loc_into_agenda(cost, loc)
+                children.append(loc)
+    return children
 
 def explore_maze():
     global markmap
-    put_loc_into_agenda(0, start_loc)
+    put_child_into_agenda(0, start_loc)
     i = 0
     while not agenda.empty():
         raw_input("\n" + str(i)+" Turn: (Hit ENTER to explore next)")
         loc = agenda.get()[LOC]
-        store_loc_on_pathmap(loc)
-        print "exploring -> " + str(loc)
+        if VFLAG:
+            print "\texploring -> " + str(loc)
+        children = get_children(loc)
+        store_node_link_on_pathmap(children, loc)
         if get_item_from_maze(loc) == '*':
-            print "found the goal!\n"
-            show_pathmap()
+            print "Found the goal!\n"
+            show_exploremap()
             return
-        put_around_locs_into_agenda(loc)
+        
+        for child in children:            
+            cost = calc_heuristic(child)
+            put_child_into_agenda(cost, child)
+            
         print_agenda()
         #print_markmap()
         i += 1
-        show_pathmap()
+        show_exploremap()
     print
     print "There is no path exists."
     exit()
@@ -220,23 +224,47 @@ def print_markmap():
         print
     print
 
-def store_loc_on_pathmap(loc):
+def store_node_link_on_pathmap(children, parent):
+    global exploremap
+    exploremap.append(parent)
     global pathmap
-    #child = get_next_node(agenda)
-    #path = (child, parent)
-    pathmap.append(loc)
+    for child in children:
+        pathmap[child] = parent
+        #print "node link: " + str(child)+"->"+str(pathmap[child])
 
-def show_pathmap():
-    for i,loc in enumerate(pathmap):
+def show_exploremap():
+    for i,loc in enumerate(exploremap):
         set_item_into_maze(loc, str(i))
     print_maze()
-    for i,loc in enumerate(pathmap):
+    for i,loc in enumerate(exploremap):
         set_item_into_maze(loc, '.')
 
+def is_adjacent_start(loc):
+    x = abs(start_loc[X] - loc[X])
+    y = abs(start_loc[Y] - loc[Y])
+    if x+y == 1:
+        True
+    else:
+        False
     
+def print_shortest_path():
+    set_item_into_maze(finish_loc, '*')
+    child = pathmap[finish_loc]
+    while not child == start_loc:
+        set_item_into_maze(child, 'x')
+        #print "node link: " + str(child)+"->"+str(pathmap[child])
+        child = pathmap[child]
+    set_item_into_maze(start_loc, 'o')
+    print_maze()    
 
 if __name__ == "__main__":
     parser = OptionParser()
+    parser.add_option(
+        "-f", "--file", 
+        type="string",
+        default="mazes/sample",
+        help="choose a formatted text file for creating a maze."
+        )
     parser.add_option(
         "-H",
         type="choice",
@@ -244,19 +272,32 @@ if __name__ == "__main__":
         dest="heuristic_type",
         default="zero",
         metavar="HEURISTIC_FUNC",
-        help="choose a heuristic function for A* algorithm form zero, manhattan, euclidean",
+        help="choose a heuristic function for A* algorithm form zero, manhattan, euclidean"
+        )
+    parser.add_option(
+        "-v", "--verbose",
+        action="store_true",
+        default=False,
+        help="display information verbosely."
         )
     (options, args) = parser.parse_args() 
     heuristic_type = options.heuristic_type
+    filename = options.file
+    VFLAG = options.verbose
     
-    set_maze("./input.txt")
-    print "Given:"
+    set_maze(filename)
+    print "Given maze:"
     print_maze()
-    print "width="+str(width)+", height="+str(height)
-    print "start: x=" + str(start_loc[0]) + ", y="+ str(start_loc[1])
-    print "finish: x=" + str(finish_loc[0]) + ", y="+ str(finish_loc[1])
+    if VFLAG:
+        print "width="+str(width)+", height="+str(height)
+        print "start: x=" + str(start_loc[0]) + ", y="+ str(start_loc[1])
+        print "finish: x=" + str(finish_loc[0]) + ", y="+ str(finish_loc[1])
     set_markmap()
     explore_maze()
+    print
+    print "SHOTEST PATH:"
+    print_shortest_path()
+    print
         
         
 
