@@ -1,0 +1,83 @@
+Author: Yohei YASUKAWA
+Date: 01/31/2011
+Mail: yasulab@gmail.com
+
+Description:
+This program implements the idea of A* algorithm
+with following three heuristic functions:
+
+- 1. Zero heuristic
+- 2. Manhattan heuristic
+- 3. Euclidean heuristic
+
+In Zero heuristic, each space in a maze is equally cost,
+so the next-exploring space should be determined by the
+definision of Queue.PriorityQueue in Python library.
+
+The priority queue sorts elements in the queue by the
+ascend order of number x if given element's costs are all
+same. Also, it sorts them by the ascend order of number y
+if given element's costs and number of x are all same.
+
+Manhattan heuristic calculates costs with Manhattan distance.
+For example, in the following state, where the '*' is goal,
+'x' is current location, and 'o' is the start, the cost
+should be 4.
+
+    * . .
+    . x .
+    . . o
+    
+Same as Zero heuristic, if some elements in the queue has
+same cost, the queue sorts them according to the sort of
+Queue.PriorityQueue in Python library.
+
+Euclidean heuristic calculates costs with Euclidean distance.
+For example, in the following state, the cost should be 10.
+
+    * . . . . . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    . . . . o . . . .
+    . . . . . . . . .
+    . . . . . . . . .
+    . . . . . . . . x
+
+
+How To Run:
+1. Get python 2.6 or higher
+
+2. Type following command in your terminal.
+
+  $ python main.py [options]
+
+Options are not needed to run the program. But,
+if you want to specify input files, heuristic
+function, or make program display much information,
+the following options will be useful.
+
+  -h, --help            show this help message and exit
+  -f FILE, --file=FILE  choose a formatted text file for creating a maze. This
+                        program uses 'mazes/sample' by default.
+  -H HEURISTIC_FUNC     choose a heuristic function for A* algorithm from
+     			'zero', 'manhattan', 'euclidean'. This program uses
+			'zero' by default.
+  -v, --verbose         display information verbosely.
+
+
+  
+Get Latest Code:
+If you would like to see/run the latest code,
+type following command to clone it with Git.
+
+  $ git clone git://github.com/yasulab/a-star-algorithm.git
+
+Or, visit the following repository.
+
+  https://github.com/yasulab/a-star-algorithm
+
+To clone the code, you need to install Git.
+
+   Git - Fast Version Control System
+   http://git-scm.com/
+

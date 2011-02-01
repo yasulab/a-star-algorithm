@@ -1,0 +1,24 @@
+3 3
+*..
+...
+..o
+
+All hueristic functions take same score.
+But, larger than 3x3 maze, Euclidean takes worst score.
+cf. "./maze/ex-2", "./output/ex-2.output"
+
+Zero:
+ 4  .  .
+ 3  .  .
+ 2  1  0   
+
+Manhattan:
+ 4  .  .
+ 3  .  .
+ 2  1  0   
+
+Euclidean:
+ 4  .  .
+ 3  2  .
+ .  1  0
+ 

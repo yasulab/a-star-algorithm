@@ -98,12 +98,12 @@ def test_pq():
 def print_agenda():
     elements = []
     i = 0
-    print "\tPriority Queue:"
+    if VFLAG:
+        print "\tPriority Queue:"
     while not agenda.empty():
         element = agenda.get()
         elements.append(element)
         if VFLAG:
-
             print '\t\t' + str(i) + ": " + str(element[LOC]) + " with " + str(element[COST]) + " cost."
         i += 1
     for elem in elements:
@@ -263,7 +263,7 @@ if __name__ == "__main__":
         "-f", "--file", 
         type="string",
         default="mazes/sample",
-        help="choose a formatted text file for creating a maze."
+        help="choose a formatted text file for creating a maze. This program uses 'mazes/sample' by default."
         )
     parser.add_option(
         "-H",
@@ -272,7 +272,7 @@ if __name__ == "__main__":
         dest="heuristic_type",
         default="zero",
         metavar="HEURISTIC_FUNC",
-        help="choose a heuristic function for A* algorithm form zero, manhattan, euclidean"
+        help="choose a heuristic function for A* algorithm from 'zero', 'manhattan', 'euclidean'. This program uses 'zero' by default."
         )
     parser.add_option(
         "-v", "--verbose",
