@@ -127,7 +127,7 @@ def manhattan_heuristic(loc):
                 y1 -= 1
                 cost += 3 
             s = (x1 + y1) * 2 + cost
-            print "s: " + str(s)
+            #print "s: " + str(s)
             cost = 0
             x2 = abs(finish_loc[X] - loc[X])
             y2 = abs(finish_loc[Y] - loc[Y])
@@ -136,7 +136,7 @@ def manhattan_heuristic(loc):
                 y2 -= 1
                 cost += 3 
             f = (x2 + y2) * 2 + cost
-            print "f: " + str(f)
+            #print "f: " + str(f)
         else:
             x1 = abs(start_loc[X] - loc[X])
             y1 = abs(start_loc[Y] - loc[Y])
