@@ -2,8 +2,8 @@ Author: Yohei YASUKAWA
 Date: 01/31/2011
 Mail: yasulab@gmail.com
 
-COMP 343 Hwk2 - A* Algorith
-===========================
+COMP 343 Hwk2 - A* Algorithm
+============================
 
 Description
 -----------
@@ -235,12 +235,76 @@ hueristic explores them first.
 
 Therefore, with the help of Queue.PriorityQueue
 convention and cost calculations of Euclidean,
-the interesting results between hueristics
+the interesting results between hueristics were
 appeared when comparing "ex-1" and "ex-2".
 
 
 Problem 2.3
 -----------
+To prove that the algorithm remains admissible,
+I devised an example map, "ex-3". So, using the
+example, I will demostrate how multiple valid
+"finish" squares work.
+
+First, the "ex-3" is a symmetric map with pure
+open spaces as follows:
+
+5 5
+*...*
+.....
+.....
+.....
+..o..
+
+With the Euclidean heuristic, the following
+exploring path was obtained.
+
+Explore Path:
+ 9  .  .  .  *
+ 8  4  .  7  .
+ .  3  .  6  .
+ .  2  1  5  .
+ .  .  0  .  .
+
+If there is only one goal at the top left,
+5th step should be on (0,1), and then, the
+program should find the goal as 6th step.
+
+However, as the path illustrates, the program
+shows that 5th step is (3,3). And then, it
+finds (3,2) and (3,1) for the other goal.
+The reason of this can be explained by the
+following cost map (You can get the costs
+by adding the '-v' or '--verbose' option).
+
+4.47 5.12  .   5.12  .
+4.60 4.57 5.23 4.57 4.60
+4.82 4.47 4.82 4.47 4.82
+5.23 4.57 4.60 4.57 5.23
+ .   5.12  o   5.12  .
+
+Assuming that the location closer to top left
+should be chosen if costs are same due to
+Queue.PriorityQueue convention, it is corrent
+to reach the goal at the top left first. Also,
+exploring (1,3), (1,2), and (1,1) is correct
+because their costs are equal to or less than
+the cost of (3.3).
+
+Next, the program explores not (0,1) or (1,0)
+but (3,3) because their node's costs are higher
+than the cost of (3.3), 4.57. For same reasons,
+it is also right to explore (3.2) and (3.1) because
+the nodes then have lowest cost in the map.
+
+Then, there are two nodes that have 4.60 cost
+at (0,1) and (4,1). And due to the convention,
+the (0,1) should be chosen. Finally, the goal
+at the top left is found in this algorithm.
+
+In conclusion, as I demonstrate above, the algorithm
+remains admissible and the example map, "ex-3",
+proves that it works correctly.
 
 
 Problem 2.4

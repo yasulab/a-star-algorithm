@@ -10,7 +10,7 @@ width = -1
 height = -1
 maze = []
 start_loc = []
-finish_loc = []
+finish_locs = []
 markmap = []
 exploremap = []
 pathmap = {}
@@ -31,7 +31,7 @@ def save_file(file):
     fd.close
 
 def set_maze(filename):
-    global width, height, start_loc, finish_loc
+    global width, height, start_loc, finish_locs
     lines = read_file(filename).splitlines()
     # tmpMaze = []
     for i,line in enumerate(lines):
@@ -60,7 +60,7 @@ def set_maze(filename):
             if char == 'o':
                 start_loc = (j, (i-1))
             elif char == '*':
-                finish_loc = (j, (i-1))
+                finish_locs.append((j, (i-1)))
         maze.append(tmpList)
 
         """
@@ -113,22 +113,30 @@ def zero_heuristic(loc):
     return 0
 
 def manhattan_heuristic(loc):
-    x1 = abs(start_loc[X] - loc[X])
-    y1 = abs(start_loc[Y] - loc[Y])
-    s = x1 + y1
-    x2 = abs(finish_loc[X] - loc[X])
-    y2 = abs(finish_loc[Y] - loc[Y])
-    f = x2 + y2
-    return s+f
+    ans = []
+    for finish_loc in finish_locs:
+        x1 = abs(start_loc[X] - loc[X])
+        y1 = abs(start_loc[Y] - loc[Y])
+        s = x1 + y1
+        x2 = abs(finish_loc[X] - loc[X])
+        y2 = abs(finish_loc[Y] - loc[Y])
+        f = x2 + y2
+        ans.append((s+f))
+    ans.sort()
+    return ans[0]
 
 def euclidean_heuristic(loc):
-    x1 = abs(start_loc[X] - loc[X])
-    y1 = abs(start_loc[Y] - loc[Y])
-    s = math.sqrt((x1**2 + y1**2))
-    x2 = abs(finish_loc[X] - loc[X])
-    y2 = abs(finish_loc[Y] - loc[Y])
-    f = math.sqrt((x2**2 + y2**2))
-    return s+f
+    ans = []
+    for finish_loc in finish_locs:
+        x1 = abs(start_loc[X] - loc[X])
+        y1 = abs(start_loc[Y] - loc[Y])
+        s = math.sqrt((x1**2 + y1**2))
+        x2 = abs(finish_loc[X] - loc[X])
+        y2 = abs(finish_loc[Y] - loc[Y])
+        f = math.sqrt((x2**2 + y2**2))
+        ans.append((s+f))
+    ans.sort()
+    return ans[0]
 
 def get_mark_from_markmap(loc):
     return markmap[loc[Y]][loc[X]]
@@ -248,14 +256,29 @@ def is_adjacent_start(loc):
         False
     
 def print_shortest_path():
-    set_item_into_maze(finish_loc, '*')
-    child = pathmap[finish_loc]
+    for finish_loc in finish_locs:
+        try:
+            pathmap[finish_loc]
+        except:
+            continue
+        set_item_into_maze(finish_loc, '*')
+        child = pathmap[finish_loc]
     while not child == start_loc:
         set_item_into_maze(child, 'x')
         #print "node link: " + str(child)+"->"+str(pathmap[child])
         child = pathmap[child]
     set_item_into_maze(start_loc, 'o')
-    print_maze()    
+    print_maze()
+
+def abbr2heuristics(heuristic_type):
+    if heuristic_type == "z":
+        return "zero"
+    elif heuristic_type == "m":
+        return "manhattan"
+    elif heuristic_type == "e":
+        return "euclidean"
+    else:
+        return heuristic_type             
 
 if __name__ == "__main__":
     parser = OptionParser()
@@ -268,11 +291,11 @@ if __name__ == "__main__":
     parser.add_option(
         "-H", "--heuristic",
         type="choice",
-        choices=["zero", "manhattan", "euclidean"],
+        choices=["zero", "manhattan", "euclidean", "z", "m", "e"],
         dest="heuristic_type",
         default="zero",
-        metavar="HEURISTIC_FUNC",
-        help="choose a heuristic function for A* algorithm from 'zero', 'manhattan', 'euclidean'. This program uses 'zero' by default."
+        metavar="HEURISTICS",
+        help="choose a heuristic function for A* algorithm from 'zero', 'manhattan', 'euclidean' (or it's abbreviations:'z', 'm', and 'e'). This program uses 'zero' by default."
         )
     parser.add_option(
         "-v", "--verbose",
@@ -280,10 +303,19 @@ if __name__ == "__main__":
         default=False,
         help="display information verbosely."
         )
+    parser.add_option(
+        "-d", "--diagonal",
+        action="store_true",
+        default=False,
+        help="switch to the program that allows diagonal travel for a cost of 3, and horizontal/vertical motion costs 2."
+        )
     (options, args) = parser.parse_args() 
     heuristic_type = options.heuristic_type
+    heuristic_type = abbr2heuristics(heuristic_type)
     filename = options.file
     VFLAG = options.verbose
+    DFLAG = options.diagonal
+    print DFLAG
     
     set_maze(filename)
     print "Given maze:"
@@ -291,7 +323,8 @@ if __name__ == "__main__":
     if VFLAG:
         print "width="+str(width)+", height="+str(height)
         print "start: x=" + str(start_loc[0]) + ", y="+ str(start_loc[1])
-        print "finish: x=" + str(finish_loc[0]) + ", y="+ str(finish_loc[1])
+        for finish_loc in finish_locs:
+            print "finish: x=" + str(finish_loc[0]) + ", y="+ str(finish_loc[1])
     set_markmap()
     explore_maze()
     print
