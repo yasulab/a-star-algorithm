@@ -1,16 +1,10 @@
-5 5
-.....
-.....
-....o
-..###
-....*
+6 5
+...###
+.##.##
+*###.#
+.####o
+......
 
-The example map where one of the heuristics
-will find an incorrect shortest path under
-'-d' option.
-
-Zero:
-
-Manhattan:
-
-Euclidean:
+The maze that only zero heuristic will
+find an incorrect shortest path under
+the '-d' option.

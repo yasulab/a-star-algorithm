@@ -390,8 +390,48 @@ proves that it works correctly.
 
 Problem 2.4
 -----------
-// What kind of map finds an incorrect shortest path
-// under '-d' option???
+As example of finding an incorrect shortest path
+under the '-d' option,  the following map, "ex-4",
+is useful to show.
+
+6 5
+...###
+.##.##
+*###.#
+.####o
+......
+
+For the map above, because the upper route takes 8
+steps and the other route takes 6 steps,
+the shortest path should use the other route.
+
+In fact, Manhattan and Euclidean heuristics
+show the following answer as the shortest path.
+
+ .  .  .  #  #  #
+ .  #  #  .  #  #
+ *  #  #  #  .  #
+ x  #  #  #  #  o
+ .  x  x  x  x  .
+
+However, the Zero hueristic shows the following answer,
+which is an incorrect shortest path.
+
+ .  x  x  #  #  #
+ x  #  #  x  #  #
+ *  #  #  #  x  #
+ .  #  #  #  #  o
+ .  .  .  .  .  .
+
+The reason of this wrong answer is that the Zero hueristic
+cannot distinguish the differences between 1.5 and 1, equivalently,
+2 costs and 3 costs, because it considers both as an equal cost, '0'.
+On the other hand, Manhattan and Euclidean are able to distinguish them
+because they can calculate the cost space by space. For the reason,
+the Zero hueristic shows the wrong answer. If you would like the
+Zero hueristic to answer correctly, you have to use the map where
+all nodes have equal cost.
+
 
 
 Get Latest Code
