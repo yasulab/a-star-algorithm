@@ -343,7 +343,6 @@ if __name__ == "__main__":
     filename = options.file
     VFLAG = options.verbose
     DFLAG = options.diagonal
-    print DFLAG
     
     set_maze(filename)
     print "Given maze:"
